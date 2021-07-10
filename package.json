@@ -1,0 +1,27 @@
+{
+  "name": "teste-backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mackson10/teste-backend.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mackson10/teste-backend/issues"
+  },
+  "homepage": "https://github.com/mackson10/teste-backend#readme",
+  "devDependencies": {
+    "eslint": "^7.30.0",
+    "jest": "^27.0.6"
+  },
+  "dependencies": {
+    "express": "^4.17.1",
+    "mongoose": "^5.13.2"
+  }
+}
