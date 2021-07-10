@@ -17,10 +17,14 @@
   },
   "homepage": "https://github.com/mackson10/teste-backend#readme",
   "devDependencies": {
+    "@types/jest": "^26.0.24",
     "eslint": "^7.30.0",
-    "jest": "^27.0.6"
+    "eslint-plugin-jest": "^24.3.6",
+    "jest": "^27.0.6",
+    "mongodb-memory-server": "^6.0.0"
   },
   "dependencies": {
+    "bcrypt": "^5.0.1",
     "express": "^4.17.1",
     "mongoose": "^5.13.2"
   }
