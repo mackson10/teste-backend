@@ -24,7 +24,8 @@ async function hashPasswordFunction (password) {
 }
 
 async function comparePasswordFunction (password) {
-  return await encrypter.compare(password, this.passwordHash)
+  const userWithHash = await exports.User.findById(this._id).select("passwordHash")
+  return await encrypter.compare(password, userWithHash.passwordHash)
 }
 
 userSchema.methods.hashPassword = hashPasswordFunction
