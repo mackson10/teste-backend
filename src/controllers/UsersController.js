@@ -10,7 +10,7 @@ module.exports.UsersController = class {
 
   async authenticate (username, password) {
     console.log(username, password)
-    const userFound = await User.findOne({ username })
+    const userFound = await User.findOne({ username, active: true })
     if (!userFound || !await userFound.comparePassword(password)) {
       throw new HttpError(400, "Invalid Credentials")
     } else {
@@ -19,7 +19,7 @@ module.exports.UsersController = class {
   }
 
   async register ({ name, birthDate, city, country, password, username, isAdmin, active }) {
-    const userFound = await User.findOne({ username })
+    const userFound = await User.findOne({ username, active: true })
     if (userFound) {
       throw new HttpError(400, "User already registered")
     } else {
@@ -61,7 +61,7 @@ module.exports.UsersController = class {
     let userFound
 
     if (mongoose.isValidObjectId(userId)) {
-      userFound = await User.findById(userId)
+      userFound = await User.findOne({ _id: userId, active: true })
     }
 
     if (!userFound) {
@@ -89,7 +89,7 @@ module.exports.UsersController = class {
     let userFound
 
     if (mongoose.isValidObjectId(userId)) {
-      userFound = await User.findById(userId)
+      userFound = await User.findOne({ _id: userId, active: true })
     }
 
     if (!userFound) {

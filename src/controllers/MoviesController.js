@@ -87,7 +87,7 @@ module.exports.MoviesController = class {
     let userFound, movieFound
 
     if (mongoose.isValidObjectId(userId)) {
-      userFound = await User.findById(userId)
+      userFound = await User.findOne({ _id: userId, active: true })
     }
     if (mongoose.isValidObjectId(movieId)) {
       movieFound = await Movie.findById(movieId)
