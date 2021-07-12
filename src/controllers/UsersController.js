@@ -1,14 +1,23 @@
 const mongoose = require("mongoose")
 
 const { HttpError } = require("../HttpError")
+const { encrypter } = require("../adapters/encrypter")
+
 const User = mongoose.model("User")
 
 module.exports.UsersController = class {
   // constructor () {}
 
-  // valida requisição (dados de um novo usuário)
-  // valida inexistencia do usuário
-  // persiste novo usuário
+  async authenticate (username, password) {
+    console.log(username, password)
+    const userFound = await User.findOne({ username })
+    if (!userFound || !await userFound.comparePassword(password)) {
+      throw new HttpError(400, "Invalid Credentials")
+    } else {
+      return await encrypter.sign({ userId: userFound._id })
+    }
+  }
+
   async register ({ name, birthDate, city, country, password, username, isAdmin, active }) {
     const userFound = await User.findOne({ username })
     if (userFound) {
@@ -35,14 +44,12 @@ module.exports.UsersController = class {
       } catch (validationErrors) {
         throw new HttpError(400, "Bad request", validationErrors)
       }
-
-      return await newUser.save()
+      const userObj = (await newUser.save()).toObject()
+      delete userObj.passwordHash
+      return userObj
     }
   }
 
-  // valida requisição (dados atualizáveis de usuário existente)
-  // valida existencia do usuário
-  // persiste modificações no usuário logado
   async updateInfo (userId, {
     name,
     birthDate,
@@ -62,7 +69,11 @@ module.exports.UsersController = class {
     } else if (typeof updateObject !== "object") {
       throw new HttpError(400, "Bad Request")
     } else {
-      Object.assign(userFound, updateObject)
+      for (const key in updateObject) {
+        if (updateObject[key]) {
+          userFound[key] = updateObject[key]
+        }
+      }
 
       try {
         await userFound.validate()
@@ -74,8 +85,6 @@ module.exports.UsersController = class {
     }
   }
 
-  // valida requisição
-  // persiste modificações no usuário logado
   async updatePassword (userId, newPassword) {
     let userFound
 
@@ -93,10 +102,6 @@ module.exports.UsersController = class {
     }
   }
 
-  // o usuário deve ser admin
-  // valida requisição com usuário alvo como parametro
-  // valida existencia do usuario alvo
-  // persiste modificação no usuário alvo
   async deactivate (userId) {
     let userFound
 
@@ -114,10 +119,6 @@ module.exports.UsersController = class {
     }
   }
 
-  // o usuário deve ser admin
-  // valida requisição com usuário alvo como parametro
-  // valida existencia do usuario alvo
-  // persiste modificação no usuário alvo
   async activate (userId) {
     let userFound
 
