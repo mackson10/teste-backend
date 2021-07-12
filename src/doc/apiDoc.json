@@ -1,0 +1,622 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "description": "IMDB exemplo",
+    "version": "1.0.0",
+    "title": "teste-backend"
+  },
+  "tags": [
+    {
+      "name": "user",
+      "description": "Rotas que manipulam os usuários"
+    },
+    {
+      "name": "movie",
+      "description": "Rotas que manipulam os filmes"
+    },
+    {
+      "name": "vote",
+      "description": "Rotas que manipulam os votos"
+    } 
+  ],
+  "paths": {
+    "/users": {
+      "post": {
+        "tags": [
+          "user"
+        ],
+        "description": "cria um novo usuário na base de dados",
+        "operationId": "register",
+        "parameters": [],
+        "requestBody": {
+          "description": "O usuario a ser registrado",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/User"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "O usuário foi registrado com sucesso",
+            "content": {
+              "application/json": {
+                "_id": { "type": "string", "example": "a0eebc996bb9bd380a11" },
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Os dados para a criação de usuário são inválidos"
+          }
+        }
+      }
+    },
+    "/users/authenticate": {
+      "post": {
+        "tags": [
+          "user"
+        ],
+        "description": "valida o login e gera um token de autenticação",
+        "operationId": "login",
+        "requestBody": {
+          "description": "Credenciais de autenticação",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/JwtAuthenticationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Token bearer",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JwtAuthenticationResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Credenciais inválidas"
+          }
+        }
+      }
+    },
+    "/users/{userId}/password": {
+      "put": {
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "tags": [
+          "user"
+        ],
+        "description": "Altera a senha do usuário",
+        "operationId": "changePassword",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "A nova senha",
+          "required": true,
+          "content": {
+            "application/json": {
+              "newPassword": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Alteração bem sucedida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/User"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Requisição não é valida para a alteração"
+          },
+          "401": {
+            "description": "Falta autenticação para efetivar a operação"
+          },
+          "403": {
+            "description": "Falta privilégios para efetivar a operação"
+          }
+        }
+      }
+    },
+    "/users/{userId}/deactivate": {
+      "put": {
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "tags": [
+          "user"
+        ],
+        "description": "Exclusão lógica do usuário",
+        "operationId": "deactivateUser",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],        
+        "responses": {
+          "200": {
+            "description": "Alteração bem sucedida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/User"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Requisição não é valida para a alteração"
+          },
+          "401": {
+            "description": "Falta autenticação para efetivar a operação"
+          },
+          "403": {
+            "description": "Falta privilégios para efetivar a operação"
+          }
+        }
+      }
+    },
+    "/users/{userId}/activate": {
+      "put": {
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "tags": [
+          "user"
+        ],
+        "description": "Desfazimento de exclusão lógica do usuário",
+        "operationId": "activateUser",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Alteração bem sucedida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/User"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Requisição não é valida para a alteração"
+          },
+          "401": {
+            "description": "Falta autenticação para efetivar a operação"
+          },
+          "403": {
+            "description": "Falta privilégios para efetivar a operação"
+          }
+        }
+      }
+    },
+    "/movies": {
+      "get": {
+        "tags": [
+          "movie"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "pode se aplicar filtros nos campos title, director, genre e castingNames",
+        "description": "retorna os filmes registrados na base de dados",
+        "operationId": "register",
+        "parameters": [],
+        "requestBody": {
+          "description": "Os campos a serem filtrados",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Movie"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Os filmes filtrados",
+            "content": {
+              "application/json": {
+                "movies": [
+                  {
+                    "schema": {
+                      "$ref": "#/components/schemas/Movie"
+                    }
+                  }
+                ]                
+              }
+            }
+          },
+          "400": {
+            "description": "Os dados para a criação do filme são inválidos"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "movie"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "apenas administradores podem registrar novos filmes",
+        "description": "registra um novo filme na base de dados",
+        "operationId": "register",
+        "parameters": [],
+        "requestBody": {
+          "description": "O filme a ser registrado",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Movie"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "O filme foi registrado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Movie"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Os dados para a criação do filme são inválidos"
+          }
+        }
+      }
+    },
+    "/movies/{movieId}": {
+      "get": {
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "tags": [
+          "movie"
+        ],
+        "description": "Retorna todas a informações do filme",
+        "operationId": "getMovieDetails",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "movieId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "O filme com todos os detalhes inclusive a média de votos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Movie"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Filme não encontrado"
+          }
+        }
+      },
+      "put": {
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "tags": [
+          "movie"
+        ],
+        "description": "Altera as informações de um filme",
+        "operationId": "updateMovieInfo",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "movieId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "As entradas a serem alteradas",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Movie"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "As informações do filme foram alteradas",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Movie"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Requisição não é valida para a alteração"
+          },
+          "401": {
+            "description": "Falta autenticação para efetivar a operação"
+          },
+          "403": {
+            "description": "Falta privilégios para efetivar a operação"
+          }
+        }
+      }
+    },
+    "/votes": {
+      "post": {
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "tags": [
+          "vote"
+        ],
+        "description": "O usuário dá o seu voto ao filme",
+        "summary": "se ja existir um voto do mesmo usuário ao filme, este será substituído",
+        "operationId": "voteOnMovie",
+        "responses": {
+          "200": {
+            "description": "Alteração bem sucedida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/User"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Requisição não é valida para a alteração"
+          },
+          "401": {
+            "description": "Falta autenticação para efetivar a operação"
+          },
+          "403": {
+            "description": "Falta privilégios para efetivar a operação"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "User": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "description": "Username",
+            "example": "JohnDoe"
+          },
+          "name": {
+            "type": "string",
+            "description": "Nome por extenso",
+            "example": "John Doe"
+          },
+          "country": {
+            "type": "string",
+            "description": "País",
+            "example": "Brasil"
+          },
+          "city": {
+            "type": "string",
+            "description": "Cidade",
+            "example": "Rio de Janeiro"
+          },
+          "isAdmin": {
+            "type": "boolean",
+            "description": "Se o usuário é administrador",
+            "example": true
+          },
+          "birthDate": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO Date",
+            "example": "2018-06-24T23:10:28+03:00"
+          }
+        }
+      },
+      "UserWithId": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "id único",
+            "example": "a0eebc996bb9bd380a11"
+          },
+          "username": {
+            "type": "string",
+            "description": "Username",
+            "example": "JohnDoe"
+          },
+          "name": {
+            "type": "string",
+            "description": "Nome por extenso",
+            "example": "John Doe"
+          },
+          "country": {
+            "type": "string",
+            "description": "País",
+            "example": "Brasil"
+          },
+          "city": {
+            "type": "string",
+            "description": "Cidade",
+            "example": "Rio de Janeiro"
+          },
+          "isAdmin": {
+            "type": "boolean",
+            "description": "Se o usuário é administrador",
+            "example": true
+          },
+          "birthDate": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO Date",
+            "example": "2018-06-24T23:10:28+03:00"
+          }
+        }
+      },
+      "JwtAuthenticationRequest": {
+        "type": "object",
+        "required": [
+          "username",
+          "password"
+        ],
+        "properties": {
+          "username": {
+            "type": "string",
+            "example": "password123",
+            "description": "nome de usuario"
+          },
+          "password": {
+            "type": "string",
+            "description": "senha",
+            "example": "password123"
+          }
+        }
+      },
+      "JwtAuthenticationResponse": {
+        "type": "object",
+        "properties": {
+          "accessToken": {
+            "type": "string",
+            "description": "access token"
+          },
+          "refreshToken": {
+            "type": "string",
+            "description": "refresh token"
+          }
+        }
+      },
+      "UpdatePasswordRequest": {
+        "type": "object",
+        "properties": {
+          "oldPassword": {
+            "type": "string",
+            "description": "password",
+            "example": "password123"
+          },
+          "newPassword": {
+            "type": "string",
+            "description": "password",
+            "example": "password123"
+          },
+          "repeatPassword": {
+            "type": "string",
+            "description": "password",
+            "example": "password123"
+          }
+        }
+      },
+      "ErrorMessage": {
+        "type": "object",
+        "properties": {
+          "payload": {
+            "description": "detalhes adicionais"
+          },
+          "message": {
+            "type": "string",
+            "description": "descrição do erro",
+            "example": "User already registered"
+          }
+        }
+      }
+    }
+  }
+}
